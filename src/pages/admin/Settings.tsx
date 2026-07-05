@@ -7,6 +7,7 @@ import Button from "@/components/admin/ui/Button";
 import Textarea from "@/components/admin/ui/Textarea";
 import Toast from "@/components/admin/ui/Toast";
 import LoadingSpinner from "@/components/admin/ui/LoadingSpinner";
+import ImageUpload from "@/components/admin/ImageUpload";
 import { Image, Type, FileText, Globe, Lock, ChevronDown, ChevronUp } from "lucide-react";
 
 function Section({ title, icon: Icon, children, defaultOpen = false }: { title: string; icon: React.ElementType; children: React.ReactNode; defaultOpen?: boolean }) {
@@ -83,7 +84,12 @@ export default function Settings() {
           </div>
           <Textarea label="Hero Tagline" value={settings.heroTagline} onChange={(e) => update("heroTagline", e.target.value)} placeholder="a video editor & motion designer..." rows={2} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <LabelInput label="Portrait Image URL" value={settings.heroImageUrl} onChange={(e) => update("heroImageUrl", e.target.value)} placeholder="https://example.com/photo.jpg" ringColor="orange" />
+            <div>
+              <LabelInput label="Portrait Image URL" value={settings.heroImageUrl} onChange={(e) => update("heroImageUrl", e.target.value)} placeholder="https://example.com/photo.jpg" ringColor="orange" />
+              <div className="mt-2">
+                <ImageUpload value={settings.heroImageUrl} onChange={(url) => update("heroImageUrl", url)} label="Or upload image" />
+              </div>
+            </div>
             <LabelInput label="YouTube Video URL" value={settings.heroVideoUrl} onChange={(e) => update("heroVideoUrl", e.target.value)} placeholder="https://youtube.com/watch?v=..." ringColor="orange" />
           </div>
           {/* Preview */}

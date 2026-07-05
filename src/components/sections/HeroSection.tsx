@@ -26,8 +26,8 @@ export default function HeroSection() {
   const youtubeId = settings.heroVideoUrl ? extractYouTubeId(settings.heroVideoUrl) : null;
 
   return (
-    <section className="relative flex flex-col h-screen overflow-x-clip">
-      <Rays raysColor={{ mode: "single", color: "#639AFF" }} intensity={40} rays={50} reach={40} position={50} backgroundColor="#0C0C0C" />
+    <section className="relative flex flex-col h-screen overflow-x-clip bg-[#0C0C0C]">
+      <Rays raysColor={{ mode: "single", color: "#639AFF" }} intensity={40} rays={50} reach={40} position={50} backgroundColor="transparent" className="absolute inset-0 z-0" />
 
       <FadeIn delay={0} y={-20}>
         <nav className="flex justify-between items-center px-6 md:px-10 pt-6 md:pt-8 relative z-10">
