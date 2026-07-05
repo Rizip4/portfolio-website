@@ -1,5 +1,5 @@
-const CLOUD_NAME = "YOUR_CLOUD_NAME";
-const UPLOAD_PRESET = "YOUR_UPLOAD_PRESET";
+const CLOUD_NAME = "fblxbn7p";
+const UPLOAD_PRESET = "portfolio-upload";
 
 export async function uploadImage(file: File): Promise<string> {
   const formData = new FormData();
