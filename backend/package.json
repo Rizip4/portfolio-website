@@ -1,6 +1,9 @@
 {
   "name": "portfolio-backend",
   "private": true,
+  "scripts": {
+    "build": "echo ok"
+  },
   "engines": {
     "node": ">=18"
   }
