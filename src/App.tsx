@@ -9,6 +9,7 @@ import AdminSkills from "@/pages/admin/Skills";
 import AdminSocials from "@/pages/admin/Socials";
 import AdminMessages from "@/pages/admin/Messages";
 import AdminSettings from "@/pages/admin/Settings";
+import PwaUpdateBanner from "@/components/PwaUpdateBanner";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="*" element={<Home />} />
         </Routes>
       </BrowserRouter>
+      <PwaUpdateBanner />
     </QueryClientProvider>
   );
 }

@@ -4,6 +4,25 @@ let firebaseEnabled = false;
 
 const JWT_SECRET = process.env.JWT_SECRET || "rijip-portfolio-secret-change-in-production";
 
+// Simple in-memory rate limiting for login attempts
+const loginAttempts = new Map();
+const LOGIN_RATE_LIMIT = 5; // max attempts
+const LOGIN_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+
+function checkLoginRateLimit(ip) {
+  const now = Date.now();
+  const attempts = loginAttempts.get(ip) || [];
+  const recentAttempts = attempts.filter(t => now - t < LOGIN_WINDOW_MS);
+  loginAttempts.set(ip, recentAttempts);
+  return recentAttempts.length < LOGIN_RATE_LIMIT;
+}
+
+function recordLoginAttempt(ip) {
+  const attempts = loginAttempts.get(ip) || [];
+  attempts.push(Date.now());
+  loginAttempts.set(ip, attempts);
+}
+
 // Minimal JWT using Web Crypto API (Node 18+)
 async function importKey(secret) {
   const encoder = new TextEncoder();
@@ -147,6 +166,10 @@ module.exports = async (req, res) => {
 
     // AUTH - LOGIN (returns real JWT)
     if (path === '/api/v1/auth/login' && req.method === 'POST') {
+      const clientIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
+      if (!checkLoginRateLimit(clientIp)) {
+        return res.status(429).json({ error: { message: 'Too many login attempts. Please try again in 15 minutes.' } });
+      }
       const { email, password } = req.body || {};
       if (useFirebase) {
         const settings = await getFromDb('settings');
@@ -159,11 +182,13 @@ module.exports = async (req, res) => {
           }
         }
       }
-      if (email === 'admin@portfolio.com' && password === 'admin123') {
+      // Only allow default credentials when Firebase is NOT configured (dev mode)
+      if (!useFirebase && email === 'admin@portfolio.com' && password === 'admin123') {
         const accessToken = await signJWT({ sub: mockAdmin.id, email: mockAdmin.email, role: 'ADMIN' }, 900000);
         const refreshToken = await signJWT({ sub: mockAdmin.id, type: 'refresh' }, 604800000);
         return res.status(200).json({ admin: mockAdmin, accessToken, refreshToken });
       }
+      recordLoginAttempt(clientIp);
       return res.status(401).json({ error: { message: 'Invalid credentials' } });
     }
 
@@ -174,6 +199,17 @@ module.exports = async (req, res) => {
       const claims = await verifyJWT(authHeader.split(' ')[1]);
       if (!claims) return res.status(401).json({ error: 'Invalid token' });
       return res.status(200).json({ admin: { id: claims.sub, email: claims.email, name: 'Admin', role: claims.role } });
+    }
+
+    // AUTH - REFRESH TOKEN
+    if (path === '/api/v1/auth/refresh' && req.method === 'POST') {
+      const { refreshToken } = req.body || {};
+      if (!refreshToken) return res.status(400).json({ error: 'Refresh token required' });
+      const claims = await verifyJWT(refreshToken);
+      if (!claims || claims.type !== 'refresh') return res.status(401).json({ error: 'Invalid refresh token' });
+      const newAccessToken = await signJWT({ sub: claims.sub, email: claims.email, role: claims.role || 'ADMIN' }, 900000);
+      const newRefreshToken = await signJWT({ sub: claims.sub, type: 'refresh' }, 604800000);
+      return res.status(200).json({ accessToken: newAccessToken, refreshToken: newRefreshToken });
     }
 
     // CHANGE PASSWORD
@@ -338,6 +374,31 @@ module.exports = async (req, res) => {
       const success = await deleteFromDb('socials', id);
       if (!success) return res.status(503).json({ error: 'Database not available' });
       return res.status(200).json({ success: true });
+    }
+
+    // SITE SETTINGS
+    if (path === '/api/v1/settings' && req.method === 'GET') {
+      if (useFirebase) {
+        const settings = await getFromDb('site-settings');
+        const data = settings && settings.length > 0 ? settings[0] : {};
+        return res.status(200).json({ data: { heroImageUrl: data.heroImageUrl || '', heroVideoUrl: data.heroVideoUrl || '' } });
+      }
+      return res.status(200).json({ data: { heroImageUrl: '', heroVideoUrl: '' } });
+    }
+    if (path === '/api/v1/settings' && req.method === 'PUT') {
+      if (!useFirebase) return res.status(503).json({ error: 'Database not available' });
+      const data = req.body || {};
+      try {
+        const db = firestore;
+        const existing = await db.collection('site-settings').doc('main').get();
+        const updatedData = { ...data, updatedAt: new Date().toISOString() };
+        if (existing.exists) {
+          await db.collection('site-settings').doc('main').update(updatedData);
+        } else {
+          await db.collection('site-settings').doc('main').set({ id: 'main', ...updatedData, createdAt: new Date().toISOString() });
+        }
+        return res.status(200).json({ data: updatedData });
+      } catch { return res.status(503).json({ error: 'Database not available' }); }
     }
 
     return res.status(404).json({ error: 'Not found' });

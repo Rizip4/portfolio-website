@@ -43,34 +43,40 @@ export default function Projects() {
   return (
     <div className="p-6 lg:p-8">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">Projects</h2>
+        <h2 className="text-2xl font-bold text-[#D7E2EA]">Projects</h2>
         <Button onClick={handleCreate}><Plus className="w-4 h-4 mr-2" />New Project</Button>
       </div>
       {projects.length === 0 ? (
-        <div className="bg-[#111] border border-gray-700 rounded-xl p-12 text-center">
-          <FolderOpen className="w-12 h-12 mx-auto mb-4 text-gray-500" />
-          <h3 className="text-lg font-medium mb-2">No projects yet</h3>
+        <div className="bg-[#111] border border-[#D7E2EA]/10 rounded-2xl p-12 text-center">
+          <FolderOpen className="w-12 h-12 mx-auto mb-4 text-[#D7E2EA]/20" />
+          <h3 className="text-lg font-medium text-[#D7E2EA]/60 mb-2">No projects yet</h3>
           <Button onClick={handleCreate}>Create Project</Button>
         </div>
       ) : (
-        <div className="grid gap-4">
+        <div className="space-y-3">
           {projects.map((p) => (
-            <div key={p.id} className="bg-[#111] border border-gray-700 rounded-xl p-6 hover:border-gray-600 transition-colors">
+            <div key={p.id} className="bg-[#111] border border-[#D7E2EA]/10 rounded-2xl p-5 hover:border-[#D7E2EA]/20 transition-all group">
               <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-semibold">{p.title}</h3>
-                    <span className={`text-xs px-2 py-1 rounded-full ${p.published ? "bg-green-600/20 text-green-500" : "bg-gray-600/20 text-gray-500"}`}>{p.published ? "Published" : "Draft"}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-1">
+                    <h3 className="text-base font-semibold text-[#D7E2EA]">{p.title}</h3>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-medium ${p.published ? "bg-green-500/10 text-green-400" : "bg-[#D7E2EA]/5 text-[#D7E2EA]/40"}`}>
+                      {p.published ? "Live" : "Draft"}
+                    </span>
                   </div>
-                  <p className="text-sm text-gray-500 mb-2">{p.category}</p>
-                  <p className="text-sm text-gray-400 line-clamp-2">{p.description}</p>
+                  <p className="text-xs text-orange-400/60 mb-1">{p.category}</p>
+                  <p className="text-sm text-[#D7E2EA]/40 line-clamp-1">{p.description}</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button onClick={() => handleTogglePublish(p.id)} className="p-2 hover:bg-gray-800 rounded-lg transition-colors" title={p.published ? "Unpublish" : "Publish"}>
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button onClick={() => handleTogglePublish(p.id)} className="p-2 hover:bg-[#D7E2EA]/5 rounded-xl transition-colors text-[#D7E2EA]/40 hover:text-[#D7E2EA]" title={p.published ? "Unpublish" : "Publish"}>
                     {p.published ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
-                  <button onClick={() => handleEdit(p)} className="p-2 hover:bg-gray-800 rounded-lg transition-colors" title="Edit"><Edit className="w-4 h-4" /></button>
-                  <button onClick={() => handleDelete(p.id)} className="p-2 hover:bg-red-600/20 rounded-lg transition-colors text-red-500" title="Delete"><Trash2 className="w-4 h-4" /></button>
+                  <button onClick={() => handleEdit(p)} className="p-2 hover:bg-[#D7E2EA]/5 rounded-xl transition-colors text-[#D7E2EA]/40 hover:text-[#D7E2EA]" title="Edit">
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => handleDelete(p.id)} className="p-2 hover:bg-red-500/10 rounded-xl transition-colors text-[#D7E2EA]/40 hover:text-red-400" title="Delete">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             </div>
@@ -81,16 +87,16 @@ export default function Projects() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input label="Title" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} required />
           <Input label="Category" value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} required />
-          <Textarea label="Description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={4} required />
+          <Textarea label="Description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} required />
           <div className="grid grid-cols-2 gap-4">
             <Input label="Accent Color" type="color" value={formData.accent} onChange={(e) => setFormData({ ...formData, accent: e.target.value })} />
             <div className="flex items-center gap-2 pt-6">
-              <input type="checkbox" id="published" checked={formData.published} onChange={(e) => setFormData({ ...formData, published: e.target.checked })} className="w-4 h-4 rounded border-gray-700 bg-gray-900" />
-              <label htmlFor="published" className="text-sm text-gray-400">Publish immediately</label>
+              <input type="checkbox" id="published" checked={formData.published} onChange={(e) => setFormData({ ...formData, published: e.target.checked })} className="w-4 h-4 rounded border-[#D7E2EA]/20 bg-[#0C0C0C] accent-orange-500" />
+              <label htmlFor="published" className="text-sm text-[#D7E2EA]/60">Publish immediately</label>
             </div>
           </div>
           <Input label="Image URL" value={formData.imageUrl} onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })} placeholder="https://..." />
-          <Input label="Video URL" value={formData.videoUrl} onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })} placeholder="https://..." />
+          <Input label="YouTube Video URL" value={formData.videoUrl} onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })} placeholder="https://youtube.com/watch?v=..." />
           <div className="flex justify-end gap-3 pt-4">
             <Button type="button" variant="secondary" onClick={() => setModalOpen(false)}>Cancel</Button>
             <Button type="submit">{editingProject ? "Update" : "Create"}</Button>

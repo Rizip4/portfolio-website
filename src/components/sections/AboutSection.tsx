@@ -1,16 +1,22 @@
 import { useEffect, useState } from "react";
 import { skillService, type Skill } from "@/services/skills";
+import { settingsService, type SiteSettings } from "@/services/settings";
 import FadeIn from "../FadeIn";
 import { GradientWaveText } from "../spell-ui/gradient-wave-text";
 import { WordsStagger } from "../spell-ui/words-stagger";
 
-const aboutText = "With more than six years of experience in video editing and motion design, i focus on cinematic storytelling, vfx compositing, and brand visuals, i truly enjoy working with businesses and creators who want their story told with impact. Let's build something incredible together!";
+const defaultAboutText = "With more than six years of experience in video editing and motion design, i focus on cinematic storytelling, vfx compositing, and brand visuals, i truly enjoy working with businesses and creators who want their story told with impact. Let's build something incredible together!";
 
 export default function AboutSection() {
   const [skills, setSkills] = useState<Skill[]>([]);
+  const [settings, setSettings] = useState<SiteSettings>({
+    heroImageUrl: "", heroVideoUrl: "", heroName: "", heroTagline: "", heroDescription: "",
+    aboutText: "", footerCopyright: "", pageTitle: "",
+  });
 
   useEffect(() => {
     skillService.getAll().then(setSkills).catch(() => {});
+    settingsService.get().then(setSettings).catch(() => {});
   }, []);
 
   return (
@@ -38,7 +44,7 @@ export default function AboutSection() {
 
       <WordsStagger inView once stagger={0.03} speed={0.4}
         className="text-[#D7E2EA] font-medium text-center leading-relaxed max-w-[560px] text-[clamp(1rem,2vw,1.35rem)] mb-16 sm:mb-20 md:mb-24">
-        {aboutText}
+        {settings.aboutText || defaultAboutText}
       </WordsStagger>
 
       {/* Skills fetched from API */}

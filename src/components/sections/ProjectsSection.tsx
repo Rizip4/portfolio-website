@@ -7,10 +7,22 @@ import { FlowButton } from "../spell-ui/flow-button";
 import { GradientWaveText } from "../spell-ui/gradient-wave-text";
 import LoadingSpinner from "@/components/admin/ui/LoadingSpinner";
 
-const fallbackProjects = [
+function extractYouTubeId(url: string): string | null {
+  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  return match ? match[1] : null;
+}
+
+type FallbackProject = {
+  num: string; name: string; category: string; description: string;
+  buttonLabel: string; videoUrl?: string;
+  images: string[];
+};
+
+const fallbackProjects: FallbackProject[] = [
   { num: "01", name: "Car animation", category: "CGI", description: "", buttonLabel: "Live Project",
     images: ["https://picsum.photos/seed/proj1a/600/400", "https://picsum.photos/seed/proj1b/600/500", "https://picsum.photos/seed/proj1c/800/700"] },
   { num: "02", name: "CGI car added to Real Footage", category: "CGI and VFX", description: "3D Tracked Scene, Added CGI toy car & Composited inside After Effects", buttonLabel: "Watch on YouTube",
+    videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     images: ["https://picsum.photos/seed/proj2a/600/400", "https://picsum.photos/seed/proj2b/600/500", "https://picsum.photos/seed/proj2c/800/700"] },
   { num: "03", name: "Board Manage", category: "SaaS", description: "", buttonLabel: "Live Project",
     images: ["https://picsum.photos/seed/proj3a/600/400", "https://picsum.photos/seed/proj3b/600/500", "https://picsum.photos/seed/proj3c/800/700"] },
@@ -20,11 +32,12 @@ const fallbackProjects = [
     images: ["https://picsum.photos/seed/proj5a/600/400", "https://picsum.photos/seed/proj5b/600/500", "https://picsum.photos/seed/proj5c/800/700"] },
 ];
 
-function ProjectCard({ project, index, total }: { project: typeof fallbackProjects[0]; index: number; total: number }) {
+function ProjectCard({ project, index, total }: { project: FallbackProject; index: number; total: number }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: cardRef, offset: ["start end", "end start"] });
   const targetScale = 1 - (total - 1 - index) * 0.03;
   const scale = useTransform(scrollYProgress, [0, 1], [1, targetScale]);
+  const youTubeId = project.videoUrl ? extractYouTubeId(project.videoUrl) : null;
 
   return (
     <div ref={cardRef} className="h-[85vh] relative" style={{ zIndex: index }}>
@@ -43,23 +56,44 @@ function ProjectCard({ project, index, total }: { project: typeof fallbackProjec
               {project.description && <p className="text-[#D7E2EA]/50 text-xs sm:text-sm mt-1 max-w-md">{project.description}</p>}
             </div>
           </div>
-          <FlowButton size="sm" borderColor="#D7E2EA">{project.buttonLabel}</FlowButton>
+          {youTubeId ? (
+            <a href={`https://www.youtube.com/watch?v=${youTubeId}`} target="_blank" rel="noopener noreferrer">
+              <FlowButton size="sm" borderColor="#D7E2EA">
+                Watch on YouTube
+              </FlowButton>
+            </a>
+          ) : (
+            <FlowButton size="sm" borderColor="#D7E2EA">{project.buttonLabel}</FlowButton>
+          )}
         </div>
         <TiltCard className="rounded-[40px] sm:rounded-[50px] md:rounded-[60px] overflow-hidden">
-          <div className="flex gap-3 sm:gap-4">
-            <div className="w-[40%] flex flex-col gap-3 sm:gap-4">
-              <img src={project.images[0]} alt={`${project.name} - 1`}
-                className="w-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-cover"
-                style={{ height: "clamp(130px, 16vw, 230px)" }} loading="lazy" />
-              <img src={project.images[1]} alt={`${project.name} - 2`}
-                className="w-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-cover"
-                style={{ height: "clamp(160px, 22vw, 340px)" }} loading="lazy" />
+          {youTubeId ? (
+            <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+              <iframe
+                src={`https://www.youtube.com/embed/${youTubeId}?rel=0&modestbranding=1`}
+                title={project.name}
+                className="absolute inset-0 w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                loading="lazy"
+              />
             </div>
-            <div className="w-[60%]">
-              <img src={project.images[2]} alt={`${project.name} - 3`}
-                className="w-full h-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-cover" loading="lazy" />
+          ) : (
+            <div className="flex gap-3 sm:gap-4">
+              <div className="w-[40%] flex flex-col gap-3 sm:gap-4">
+                <img src={project.images[0]} alt={`${project.name} - 1`}
+                  className="w-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-cover"
+                  style={{ height: "clamp(130px, 16vw, 230px)" }} loading="lazy" />
+                <img src={project.images[1]} alt={`${project.name} - 2`}
+                  className="w-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-cover"
+                  style={{ height: "clamp(160px, 22vw, 340px)" }} loading="lazy" />
+              </div>
+              <div className="w-[60%]">
+                <img src={project.images[2]} alt={`${project.name} - 3`}
+                  className="w-full h-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-cover" loading="lazy" />
+              </div>
             </div>
-          </div>
+          )}
         </TiltCard>
       </motion.div>
     </div>
@@ -80,6 +114,7 @@ export default function ProjectsSection() {
             category: p.category,
             description: p.description,
             buttonLabel: p.videoUrl ? "Watch on YouTube" : "Live Project",
+            videoUrl: p.videoUrl,
             images: [
               p.imageUrl || `https://picsum.photos/seed/db${i}a/600/400`,
               `https://picsum.photos/seed/db${i}b/600/500`,

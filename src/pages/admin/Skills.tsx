@@ -35,22 +35,24 @@ export default function Skills() {
   return (
     <div className="p-6 lg:p-8">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">Skills</h2>
+        <h2 className="text-2xl font-bold text-[#D7E2EA]">Skills</h2>
         <Button onClick={() => setModalOpen(true)}><Plus className="w-4 h-4 mr-2" />Add Skill</Button>
       </div>
       {skills.length === 0 ? (
-        <div className="bg-[#111] border border-gray-700 rounded-xl p-12 text-center">
-          <Tag className="w-12 h-12 mx-auto mb-4 text-gray-500" />
-          <h3 className="text-lg font-medium mb-2">No skills yet</h3>
+        <div className="bg-[#111] border border-[#D7E2EA]/10 rounded-2xl p-12 text-center">
+          <Tag className="w-12 h-12 mx-auto mb-4 text-[#D7E2EA]/20" />
+          <h3 className="text-lg font-medium text-[#D7E2EA]/60 mb-2">No skills yet</h3>
           <Button onClick={() => setModalOpen(true)}>Add Skill</Button>
         </div>
       ) : (
-        <div className="bg-[#111] border border-gray-700 rounded-xl p-6">
+        <div className="bg-[#111] border border-[#D7E2EA]/10 rounded-2xl p-6">
           <div className="flex flex-wrap gap-2">
             {skills.map((s) => (
-              <div key={s.id} className="flex items-center gap-2 px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg group">
-                <span className="text-sm">{s.name}</span>
-                <button onClick={() => handleDelete(s.id)} className="p-1 hover:bg-red-600/20 rounded transition-colors text-red-500 opacity-0 group-hover:opacity-100"><Trash2 className="w-3 h-3" /></button>
+              <div key={s.id} className="flex items-center gap-2 px-4 py-2 bg-[#0C0C0C] border border-[#D7E2EA]/5 rounded-xl group">
+                <span className="text-sm text-[#D7E2EA]/70">{s.name}</span>
+                <button onClick={() => handleDelete(s.id)} className="p-1 hover:bg-red-500/10 rounded-lg transition-colors text-[#D7E2EA]/20 hover:text-red-400 opacity-0 group-hover:opacity-100">
+                  <Trash2 className="w-3 h-3" />
+                </button>
               </div>
             ))}
           </div>
