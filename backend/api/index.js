@@ -161,7 +161,7 @@ module.exports = async (req, res) => {
       return res.status(200).json({ status: 'ok', database: useFirebase ? 'firebase' : 'mock', mode: useFirebase ? 'firestore' : 'fallback' });
     }
     if (path === '/' || path === '/api') {
-      return res.status(200).json({ name: 'Portfolio API', version: '1.1.0', endpoints: ['/api/v1/auth/login', '/api/v1/projects', '/api/v1/skills'] });
+      return res.status(200).json({ name: 'Portfolio API', version: '1.2.0', endpoints: ['/api/v1/auth/login', '/api/v1/projects', '/api/v1/skills', '/api/v1/settings'] });
     }
 
     // AUTH - LOGIN (returns real JWT)
