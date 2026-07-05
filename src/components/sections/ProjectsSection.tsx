@@ -1,16 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { projectService } from "@/services/projects";
+import { extractYouTubeId } from "@/lib/utils";
 import FadeIn from "../FadeIn";
 import { TiltCard } from "../spell-ui/tilt-card";
 import { FlowButton } from "../spell-ui/flow-button";
 import { GradientWaveText } from "../spell-ui/gradient-wave-text";
 import LoadingSpinner from "@/components/admin/ui/LoadingSpinner";
-
-function extractYouTubeId(url: string): string | null {
-  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-  return match ? match[1] : null;
-}
 
 type FallbackProject = {
   num: string; name: string; category: string; description: string;

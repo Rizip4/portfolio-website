@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { authService } from "@/services/auth";
 import { settingsService, type SiteSettings } from "@/services/settings";
+import { extractYouTubeId } from "@/lib/utils";
 import { LabelInput } from "@/components/spell-ui/label-input";
 import Button from "@/components/admin/ui/Button";
 import Textarea from "@/components/admin/ui/Textarea";
@@ -60,11 +61,6 @@ export default function Settings() {
     try { await authService.changePassword(currentPassword, newPassword); setToast({ message: "Password changed", type: "success" }); setCurrentPassword(""); setNewPassword(""); setConfirmPassword(""); }
     catch { setToast({ message: "Failed to change password", type: "error" }); }
     finally { setPasswordLoading(false); }
-  };
-
-  const extractYouTubeId = (url: string): string | null => {
-    const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-    return match ? match[1] : null;
   };
 
   const update = (key: keyof SiteSettings, value: string) => setSettings(prev => ({ ...prev, [key]: value }));

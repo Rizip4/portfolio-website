@@ -6,11 +6,7 @@ import { SlideUpText } from "../spell-ui/slide-up-text";
 import { FlowButton } from "../spell-ui/flow-button";
 import Rays from "../spell-ui/light-rays";
 import { settingsService, type SiteSettings } from "@/services/settings";
-
-function extractYouTubeId(url: string): string | null {
-  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-  return match ? match[1] : null;
-}
+import { extractYouTubeId } from "@/lib/utils";
 
 export default function HeroSection() {
   const [settings, setSettings] = useState<SiteSettings>({
